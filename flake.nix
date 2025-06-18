@@ -1,5 +1,5 @@
 {
-  description = "A flake for running a configured Unbound DNS resolver on non-NixOS systems";
+  description = "A flake for running a configured Unbound DNS resolver (DoH version)";
 
   inputs = {
     # Используем стабильный канал nixpkgs, но можно и unstable
@@ -10,13 +10,8 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      cacert = pkgs.cacert;
 
-      # Добавляем пакет с корневыми сертификатами
-      cacert = pkgs.cacert;      
-
-      # --- НОВЫЙ БЛОК: СКАЧИВАЕМ ROOT.HINTS ---
-      # Мы явно скачиваем файл с корневыми DNS-серверами.
-      # SHA256-хэш гарантирует, что файл не будет подменен.
       rootHintsFile = pkgs.fetchurl {
         url = "https://www.internic.net/domain/named.root";
         sha256 = "sha256-H2loKjfXhWsc9XRl4IDlm1jQ0E67SgwjopMwxti3JWA=";
@@ -31,11 +26,8 @@
           use-syslog: no
           logfile: ""
           verbosity: 3
-
-          # Ссылаемся на скачанный нами файл в /nix/store
+          
           root-hints: "${rootHintsFile}"
-
-          # Указываем Unbound, где найти корневые сертификаты для проверки TLS.
           tls-cert-bundle: "${cacert}/etc/ssl/certs/ca-bundle.crt"
 
           interface: 127.0.0.1
@@ -52,15 +44,17 @@
           private-address: 192.168.0.0/16
           private-address: 172.16.0.0/12
           private-address: 10.0.0.0/8
-
-          # Используем DNS-over-HTTPS (DoH)
+          
+          # --- КОНФИГУРАЦИЯ DNS-over-HTTPS (DoH) ---
           forward-zone:
             name: "."
-            forward-ssl-upstream: yes
-            forward-addr: 1.1.1.1#cloudflare-dns.com/dns-query
-            forward-addr: 1.0.0.1#cloudflare-dns.com/dns-query
-            forward-addr: 8.8.8.8#dns.google/dns-query
-            forward-addr: 8.8.4.4#dns.google/dns-query
+            # Включаем пересылку через TLS (этот флаг работает и для DoH)
+            forward-tls-upstream: yes
+            
+            # Указываем адреса серверов в специальном формате для DoH
+            # Синтаксис: IP_адрес@ПОРТ#Имя_сервера_для_проверки_сертификата/путь_к_API
+            forward-addr: 1.1.1.1@443#cloudflare-dns.com/dns-query
+            forward-addr: 1.0.0.1@443#cloudflare-dns.com/dns-query
       '';
 
       unbound-runner = pkgs.writeShellScriptBin "unbound-start" ''
