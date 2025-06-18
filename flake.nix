@@ -11,6 +11,9 @@
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
+      # Добавляем пакет с корневыми сертификатами
+      cacert = pkgs.cacert;      
+
       # --- НОВЫЙ БЛОК: СКАЧИВАЕМ ROOT.HINTS ---
       # Мы явно скачиваем файл с корневыми DNS-серверами.
       # SHA256-хэш гарантирует, что файл не будет подменен.
@@ -29,9 +32,11 @@
           logfile: ""
           verbosity: 3
 
-          # --- ИЗМЕНЕНИЕ: УКАЗЫВАЕМ ПРАВИЛЬНЫЙ ПУТЬ ---
           # Ссылаемся на скачанный нами файл в /nix/store
           root-hints: "${rootHintsFile}"
+
+          # Указываем Unbound, где найти корневые сертификаты для проверки TLS.
+          tls-cert-bundle: "${cacert}/etc/ssl/certs/ca-bundle.crt"
 
           interface: 127.0.0.1
           port: 5353
