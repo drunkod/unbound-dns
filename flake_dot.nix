@@ -30,9 +30,7 @@
           use-syslog: no
           logfile: ""
           verbosity: 3
-
-           # Добавляем путь к корневым серверам для надежности
-          root-hints: "${pkgs.unbound}/etc/unbound/root.hints"         
+          
 
           # Слушаем только на localhost.
           # Используем порт 5353 для тестов без sudo. Для продакшена поменяйте на 53.
@@ -53,14 +51,14 @@
           private-address: 172.16.0.0/12
           private-address: 10.0.0.0/8
 
-          # --- ИСПОЛЬЗУЕМ DNS-over-HTTPS (DoH) ---
-          # Он работает через стандартный порт 443 и не блокируется провайдерами.
+          # Перенаправляем все запросы на надежные DNS-серверы по защищенному каналу (DNS-over-TLS)
           forward-zone:
-            name: "."
-            forward-ssl-upstream: yes
-            forward-addr: "https://1.1.1.1/dns-query"
-            forward-addr: "https://1.0.0.1/dns-query"
-            forward-addr: "https://dns.google/dns-query"
+            name: "." # Перенаправлять все
+            forward-tls-upstream: yes
+            # Список серверов. Unbound сам выберет самый быстрый.
+            forward-addr: 1.1.1.1@853#cloudflare-dns.com
+            forward-addr: 9.9.9.9@853#dns.quad9.net
+            forward-addr: 8.8.8.8@853#dns.google
       '';
 
       # --- Создание нашего пакета ---
