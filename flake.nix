@@ -3,7 +3,7 @@
 
   inputs = {
     # Используем стабильный канал nixpkgs, но можно и unstable
-    nixpkgs.url = "github:NixOS/nixpkgs/unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; # Or a specific release
   };
 
   outputs = { self, nixpkgs }:
