@@ -2,8 +2,7 @@
   description = "A flake for running a basic recursive Unbound DNS resolver";
 
   inputs = {
-    # Используем стабильный канал nixpkgs, но можно и unstable
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable"; # Or a specific release
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
   };
 
   outputs = { self, nixpkgs }:
