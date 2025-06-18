@@ -58,9 +58,11 @@
           forward-zone:
             name: "."
             forward-ssl-upstream: yes
-            forward-addr: "https://1.1.1.1/dns-query"
-            forward-addr: "https://1.0.0.1/dns-query"
-            forward-addr: "https://dns.google/dns-query"
+            # Syntax: IP_ADDRESS#ServerName/path
+            forward-addr: 1.1.1.1#cloudflare-dns.com/dns-query
+            forward-addr: 1.0.0.1#cloudflare-dns.com/dns-query
+            forward-addr: 8.8.8.8#dns.google/dns-query
+            forward-addr: 8.8.4.4#dns.google/dns-query
       '';
 
       # --- Создание нашего пакета ---
