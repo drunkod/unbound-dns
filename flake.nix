@@ -16,7 +16,7 @@
       # SHA256-хэш гарантирует, что файл не будет подменен.
       rootHintsFile = pkgs.fetchurl {
         url = "https://www.internic.net/domain/named.root";
-        sha256 = "";
+        sha256 = "sha256-H2loKjfXhWsc9XRl4IDlm1jQ0E67SgwjopMwxti3JWA=";
       };
 
       unboundConf = pkgs.writeText "unbound.conf" ''
